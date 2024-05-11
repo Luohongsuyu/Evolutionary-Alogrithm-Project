@@ -7,7 +7,7 @@ In the evolutionary robotics project, we aim to use evolutionary algorithms to d
 
 The following images show the results of the evolution.
 
-![Example Image](https://github.com/Luohongsuyu/Evolutionary-Alogrithm-Project/tree/main/Image/GIF1.gif)<br>
+![Image](https://github.com/Luohongsuyu/Evolutionary-Alogrithm-Project/blob/main/Image/GIF1.gif)<br>
 Figure 1. Intersection Location on Google<br>
 
 
