@@ -23,7 +23,15 @@ Figure 4. Dot plot of individuals<br>
 
 ## Symbolic Regression
 
-In the symbolic regression project, we studied the basic GP algorithm and the GEP algorithm based on the DEAP framework. We also incorporated a non-dominated sorting algorithm, NSGA-II, which utilizes the concept of Pareto optimality. Additionally, we introduced a new method for calculating formula complexity in an attempt to address the issue of formula bloat in symbolic regression problems.
+In the symbolic regression project, I studied the basic GP algorithm and the GEP algorithm based on the DEAP framework. I also incorporated a non-dominated sorting algorithm, NSGA-II, which utilizes the concept of Pareto optimality. Additionally, I introduced a new method for calculating formula complexity in an attempt to address the issue of formula bloat in symbolic regression problems.(Source code in SR folder)
 
 The following table and images show the results and some evaluation of the algorithm.
 
+![Image](Image/Regression_Learning_Curve.png)<br>
+Figure 5. Comparison between GP, GEP and my work<br>
+
+![Image](Image/Regression_Converge_Plot.png)<br>
+Figure 6. Converge plot of the algorithm<br>
+
+Table 1. Regression result comparison<br>
+![Image](Image/SR_result.png)<br>
