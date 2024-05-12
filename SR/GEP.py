@@ -5,48 +5,11 @@ import random
 import operator 
 import os
 import math
-import matplotlib.pyplot as plt
-import sympy as sp
-import warnings
-
-# 忽略 SymPyDeprecationWarning
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-def simplify_expression(expression, input_names):
-    """将GEP表达式转换为sympy表达式并简化
-    :param expression: GEP个体的字符串表示
-    :param input_names: GEP模型中的输入变量名称列表
-    """
-    # 创建一个符号变量字典，包括所有输入变量
-    symbols = {name: sp.symbols(name) for name in input_names}
-    
-    # 定义自定义函数到SymPy操作的映射，对于减法和除法使用lambda表达式
-    locals_dict = {
-        'add': lambda a, b: a + b,
-        'sub': lambda a, b: a - b,
-        'mul': lambda a, b: a * b,
-        'div': lambda a, b: a / b if b != 0 else sp.zoo,  # 防止除以0
-        'cos': sp.cos,
-        'sin': sp.sin,
-        **symbols  # 包含前面创建的所有符号变量
-    }
-    
-    # 将GEP表达式转换为sympy表达式，使用locals_dict处理自定义函数名
-    sympy_expr = sp.sympify(expression, locals=locals_dict)
-    
-    # 简化表达式
-    simplified_expr = sp.simplify(sympy_expr)
-    
-    return simplified_expr
 
 # 在每次运行时使用不同的种子值
 s = random.randint(1, 1000)
 random.seed(s)
 np.random.seed(s)
-
-folder_name = "imagee"
-if not os.path.exists(folder_name):
-    os.makedirs(folder_name)
 
 def load_data(file_path):
     """从文本文件中加载数据并转换为 (x, y) 对的列表格式"""
@@ -60,7 +23,7 @@ def load_data(file_path):
     return data
 
 # 调用函数读取数据
-file_path = 'fish_angel.txt'  # 将此路径替换为您的文件路径
+file_path = 'second_order_undamped.txt'  # 将此路径替换为您的文件路径
 data_file = load_data(file_path)
 data = np.array(data_file)
 X = data[:, 0]
@@ -90,10 +53,10 @@ pset.add_function(operator.add, 2)
 pset.add_function(operator.sub, 2)
 pset.add_function(operator.mul, 2)
 pset.add_function(protected_div, 2)
-#pset.add_function(protected_exp, 1)
+pset.add_function(protected_exp, 1)
 pset.add_function(math.sin, 1)   # 添加 sin 函数
 pset.add_function(math.cos, 1)   # 添加 cos 函数
-pset.add_ephemeral_terminal(name='enc', gen=lambda: random.uniform(-1, 1)) # each ENC is a random integer within [-10, 10]
+pset.add_ephemeral_terminal(name='enc', gen=lambda: random.randint(-10, 10)) # each ENC is a random integer within [-10, 10]
 
 
 from deap import creator, base, tools
@@ -102,8 +65,8 @@ creator.create("FitnessMin", base.Fitness, weights=(-1,))  # to minimize the obj
 creator.create("Individual", gep.Chromosome, fitness=creator.FitnessMin)
 
 
-h = 4 
-n_genes = 2   
+h = 10
+n_genes = 2
 
 toolbox = gep.Toolbox()
 toolbox.register('gene_gen', gep.Gene, pset=pset, head_length=h)
@@ -119,12 +82,12 @@ def evaluate(individual):
 
 toolbox.register('evaluate', evaluate)
 
-toolbox.register('select', tools.selTournament, tournsize=4)
+toolbox.register('select', tools.selTournament, tournsize=3)
 
 toolbox.register('mut_uniform', gep.mutate_uniform, pset=pset, ind_pb=0.05, pb=1)
 
 toolbox.register('cx_1p', gep.crossover_one_point)
-toolbox.register('cx_2p', gep.crossover_two_point)
+#toolbox.register('cx_2p', gep.crossover_two_point)
 
 toolbox.register('mut_ephemeral', gep.mutate_uniform_ephemeral, ind_pb='1p') 
 toolbox.pbs['mut_ephemeral'] = 1  
@@ -155,8 +118,6 @@ def run_gep_algorithm():
     
     log_file_path = 'GEP学习曲线.txt'  # 适应度记录文件
     best_fitness = float('inf')  # 初始化最佳适应度为无穷大
-    best_fitness1 = float('inf')
-
     
     # 开始进化
     for gen in range(n_gen):
@@ -181,53 +142,32 @@ def run_gep_algorithm():
         
         # 应用交叉和变异
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            if random.random() < 0.9:
-                toolbox.cx_1p(child1, child2)
-                del child1.fitness.values
-                del child2.fitness.values
+            toolbox.cx_1p(child1, child2)
+            del child1.fitness.values
+            del child2.fitness.values
                 
         for mutant in offspring:
             if random.random() < 0.2:
-                toolbox.mut_uniform(mutant)
+                cho = random.random()
+                if cho <=0.5:
+                    toolbox.mut_uniform(mutant)
+                else:
+                    toolbox.mut_ephemeral(mutant)
                 del mutant.fitness.values
         
         print("gen:",gen,"best fitness:",best_fitness)
-
-        # 检查这一代是否有更好的 fitness1
-        current_best = min(pop, key=lambda ind: ind.fitness.values[0])
-        current_best_fitness1 = current_best.fitness.values[0]
-
-        if current_best_fitness1 < best_fitness1:
-            # 更新历史最佳 fitness1
-            best_fitness1 = current_best_fitness1
-
-            # 编译个体以获得可执行的函数
-            func = toolbox.compile(current_best)
-
-            # 使用数据中的 x 值计算 y 值
-            x_values = [x for x, _ in data]
-            y_values = [func(x) for x in x_values]
-
-            # 绘制数据点和当前最佳个体生成的曲线
-            plt.scatter(*zip(*data), label='Data Points',s=1)  # 数据点
-            plt.plot(x_values, y_values, color='red', label='Best Individual')  # 最佳个体生成的曲线
-            plt.title(f"Generation {gen}: Best Individual")
-            plt.xlabel('X')
-            plt.ylabel('Y')
-            plt.legend()
-            plt.savefig(os.path.join(folder_name, f'result_{gen}.png'))
-            plt.close()
-
+           
+        if gen % 250 == 0:
+            with open('GEP点图', 'a') as file:
+                for ind in pop:
+                    file.write(f"{gen}, {ind.fitness.values}\n")
+        
         # 下一代种群
         pop[:] = offspring
         
     # 打印最终的最佳个体
     best_ind = hof[0]
     print(f'Best Individual: {best_ind}, Fitness: {best_ind.fitness.values[0]}')
-    input_names = ['x']  # 假设GEP模型中只有一个输入变量x
-
-    simplified_expr = simplify_expression(best_ind, input_names)
-    print(f'Simplified Expression of the Best Individual: {simplified_expr}')
 
 # 执行算法
 run_gep_algorithm()

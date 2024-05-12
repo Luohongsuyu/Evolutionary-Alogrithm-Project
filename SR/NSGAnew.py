@@ -32,7 +32,7 @@ def load_data(file_path):
     return data
 
 # 调用函数读取数据
-file_path = 'fish_angel.txt'  # 将此路径替换为您的文件路径
+file_path = 'second_order_undamped.txt'  # 将此路径替换为您的文件路径
 data = load_data(file_path)
 
 
@@ -52,23 +52,17 @@ def max_trig_nesting_depth(individual):
     return 20*total_count
 
     
-# 计算数据点导数的符号
-data_deriv_signs = np.sign([data[i+1][1] - data[i][1] for i in range(len(data)-1)])
-   
 
-def evalFitness(individual, points, toolbox,data_deriv_signs):
+
+# 修改后的适应度评估函数
+def evalFitness(individual, points, toolbox):
     func = toolbox.compile(expr=individual)
     # 计算平方误差
     sqerrors = ((func(x) - y)**2 for x, y in points)
     fitness1 = math.fsum(sqerrors) / len(points)
-    
-    
-    # 计算估计方程在数据点导数的符号
-    estimated_deriv_signs = np.sign([func(points[i+1][0]) - func(points[i][0]) for i in range(len(points)-1)])
-    
-    # 计算导数符号匹配的适应度（不匹配的数量）
-    fitness2 = sum(data_deriv_signs != estimated_deriv_signs)
-    
+    # 计算复杂度（包括三角函数嵌套深度的考虑）
+    max_nesting = max_trig_nesting_depth(individual)
+    fitness2 = (len(individual) + max_nesting)
     return fitness1, fitness2
 
 # 定义一个生成 [0, 10] 范围内随机数的函数
@@ -78,7 +72,7 @@ def random_0_1():
 
 def random_01():
     
-    return random.uniform(0, 1)
+    return random.uniform(0, 10)
 
 def pi():
     return math.pi
@@ -122,11 +116,10 @@ def main():
     pset.addPrimitive(operator.add, 2) # 加法运算，两位运算符
     pset.addPrimitive(operator.sub, 2)
     pset.addPrimitive(operator.mul, 2)
-    pset.addPrimitive(protected_div, 2)
+    #pset.addPrimitive(protected_div, 2)
     pset.addPrimitive(protected_exp, 1)   # 添加自然指数函数，一个参数
     pset.addPrimitive(math.sin, 1)   # 添加 sin 函数
-    pset.addPrimitive(math.cos, 1)
-    #pset.addEphemeralConstant("rand_0_1", random_0_1)
+    pset.addEphemeralConstant("rand_0_1", random_0_1)
     pset.addEphemeralConstant("rand_01", random_01)
     
     
@@ -138,7 +131,7 @@ def main():
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("compile", gp.compile, pset=pset)
-    toolbox.register("evaluate", evalFitness, points=data, toolbox=toolbox, data_deriv_signs = data_deriv_signs)
+    toolbox.register("evaluate", evalFitness, points=data, toolbox=toolbox)
     toolbox.register("select", tools.selNSGA2)
     #toolbox.register("select_t", tools.selTournament, tournsize=3)
     #toolbox.register("select", tools.selNSGA3, ref_points=tools.uniform_reference_points(nobj=2, p=12))
@@ -189,7 +182,7 @@ def main():
                 
                 
 
-            if random.random() < 0.3:
+            if random.random() < 0.2:
                 toolbox.mutate(mutant)               
                 del mutant.fitness.values
 
@@ -211,12 +204,12 @@ def main():
             # 获取并显示最优个体的表达式
             best_ind = hof[0]
             print("Generation:", gen ,"Fitness: ", best_ind.fitness.values[0], best_ind.fitness.values[1])
-        
+        '''       
         if gen % 500 == 0:
-            with open('点图数据_100000代', 'a') as file:
+            with open('本文算法点图', 'a') as file:
                 for ind in pop:
                     file.write(f"{gen}, {ind.fitness.values}\n")
-
+        '''  
         # 检查这一代是否有更好的 fitness1
         current_best = min(pop, key=lambda ind: ind.fitness.values[0])
         current_best_fitness1 = current_best.fitness.values[0]
@@ -242,9 +235,10 @@ def main():
             plt.savefig(os.path.join(folder_name, f'result_{gen}.png'))
             plt.close()
             # 记录到文件
-            with open('学习曲线数据_100000代', 'a') as file:
+            '''
+            with open('本文算法学习曲线', 'a') as file:
                 file.write(f"{gen}, {best_fitness1}\n")
-
+            '''
 
 
     # 找到 Pareto 前沿的个体
