@@ -3,7 +3,7 @@
 This GitHub repo contains all the content related to evolutionary algorithms that I learned under the guidance of Professor Hod Lipson, mainly including symbolic regression and evolutionary robotics.
 
 ## Evolutionary robotics
-In the evolutionary robotics project, we aim to use evolutionary algorithms to design a robot made of mass and springs. The robot evolves by combining different structures and varying the extension cycles of the springs. The goal is to find a robot that can move in a specified direction.
+In the evolutionary robotics project, we aim to use evolutionary algorithms to design a robot made of mass and springs. I first built a simple spring-mass physics simulator to evolve our robots, and then the robot evolves by combining different structures and varying the extension cycles of the springs. The goal is to find a robot that can move in a specified direction. (Source code in ROBOEVO folder)
 
 The following images show the results and some evaluation of the algorithm.
 
@@ -20,4 +20,10 @@ Figure 3. Learning Curve of algorithm<br>
 Figure 4. Dot plot of individuals<br>
 
 
+
+## Symbolic Regression
+
+In the symbolic regression project, we studied the basic GP algorithm and the GEP algorithm based on the DEAP framework. We also incorporated a non-dominated sorting algorithm, NSGA-II, which utilizes the concept of Pareto optimality. Additionally, we introduced a new method for calculating formula complexity in an attempt to address the issue of formula bloat in symbolic regression problems.
+
+The following table and images show the results and some evaluation of the algorithm.
 
