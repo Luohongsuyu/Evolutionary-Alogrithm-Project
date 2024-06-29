@@ -12,16 +12,16 @@ Figure 1. Verification of the simulator through energy conservation<br>
 
 
 ![Image](https://github.com/Luohongsuyu/Evolutionary-Alogrithm-Project/blob/main/Image/GIF1.gif)<br>
-Figure 1. Best result from evolution<br>
+Figure 2. Best result from evolution<br>
 
 ![Image](https://github.com/Luohongsuyu/Evolutionary-Alogrithm-Project/blob/main/Image/GIF2.gif)<br>
-Figure 2. comparison between two different result<br>
+Figure 3. comparison between two different result<br>
 
 ![Image](Image/Learning_curve.png)<br>
-Figure 3. Learning Curve of algorithm<br>
+Figure 4. Learning Curve of algorithm<br>
 
 ![Image](Image/dot_plot.png)<br>
-Figure 4. Dot plot of individuals<br>
+Figure 5. Dot plot of individuals<br>
 
 
 
@@ -32,7 +32,7 @@ In the symbolic regression project, I studied the basic GP algorithm and the GEP
 The following table and images show the results and some evaluation of the algorithm.
 
 ![Image](Image/Regression_Learning_Curve.png)<br>
-Figure 5. Comparison between GP, GEP and my work<br>
+Figure 6. Comparison between GP, GEP and my work<br>
 
 ![Image](Image/Regression_Converge_Plot.png)<br>
 Figure 6. Converge plot of the algorithm<br>
